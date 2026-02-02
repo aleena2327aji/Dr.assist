@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MedicaIndex - Single File Demo</title>
+  <title><h1 class="text-3xl font-bold mb-6 text-blue-800">Dr. Assist</h1>
   <style>
     body { font-family: Arial, Helvetica, sans-serif; margin:0; padding:0; background:#f7f8fb; color:#222; }
     header { background:#2b6cb0; color:white; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; }
@@ -28,7 +28,7 @@
 </head>
 <body>
   <header>
-    <h1>MedicaIndex (Single-file demo)</h1>
+    <h1 class="text-3xl font-bold mb-6 text-blue-800">Dr. Assist</h1>
     <div id="top-controls">
       <span id="welcome" class="small"></span>
       <nav id="nav" class="hidden">
@@ -509,7 +509,10 @@
           u.role = 'free'; u.subscriptionEnd = null; changed = true;
         }
       });
-      if (changed) localStorage.setItem(KEY_USERS, JSON.stringify(users));
+      if <div class="mt-8 text-center text-gray-500 text-xs">
+    © 2024 Dr. Assist. All rights reserved.
+</div>
+
       const auth = getAuth();
       if (auth && currentUser()) {
         showView('dashboard');
