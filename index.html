@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MedicaIndex - Single File Demo</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; margin:0; padding:0; background:#f7f8fb; color:#222; }
+    header { background:#2b6cb0; color:white; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; }
+    header h1 { margin:0; font-size:18px; }
+    nav button { margin-left:8px; padding:6px 10px; border-radius:6px; border: none; background:#ffffff22; color:white; cursor:pointer; }
+    .container { padding:20px; max-width:1000px; margin:20px auto; background:white; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
+    .hidden { display:none; }
+    input, select, textarea { padding:8px; width:100%; margin:8px 0; box-sizing:border-box; border:1px solid #d0d7de; border-radius:6px; }
+    .row { display:flex; gap:12px; }
+    .col { flex:1; }
+    .paper { border-bottom:1px solid #eee; padding:10px 0; }
+    .tag { background:#e2e8f0; color:#2b6cb0; padding:4px 8px; border-radius:999px; font-size:12px; margin-left:8px; }
+    .premium { background:#fee2e2; color:#b91c1c; padding:4px 8px; border-radius:6px; font-weight:600; }
+    .meta { color:#555; font-size:13px; }
+    .small { font-size:13px; color:#666; }
+    .btn { background:#2b6cb0; color:white; padding:8px 12px; border-radius:6px; border:none; cursor:pointer; }
+    .btn-secondary { background:#edf2ff; color:#2b6cb0; border:1px solid #c7d2fe; }
+    .flex { display:flex; gap:8px; align-items:center; }
+    .user-chip { background:#f1f5f9; padding:6px 8px; border-radius:999px; font-size:13px; }
+    footer { text-align:center; color:#888; font-size:13px; margin:14px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MedicaIndex (Single-file demo)</h1>
+    <div id="top-controls">
+      <span id="welcome" class="small"></span>
+      <nav id="nav" class="hidden">
+        <button data-view="dashboard">Dashboard</button>
+        <button data-view="papers">Papers</button>
+        <button data-view="posts">Posts</button>
+        <button data-view="network">Network</button>
+        <button id="logoutBtn">Logout</button>
+      </nav>
+      <div id="auth-nav">
+        <button data-view="login" class="btn-secondary">Login</button>
+        <button data-view="register" class="btn">Register</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Login -->
+    <section id="login" class="view">
+      <h2>Login</h2>
+      <div style="max-width:420px">
+        <input id="loginEmail" placeholder="Email" />
+        <input id="loginPassword" type="password" placeholder="Password" />
+        <button id="loginBtn" class="btn">Login</button>
+        <p class="small">Don't have an account? <a href="#" id="toRegister">Register</a></p>
+      </div>
+    </section>
+
+    <!-- Register -->
+    <section id="register" class="view hidden">
+      <h2>Register</h2>
+      <div style="max-width:520px">
+        <input id="regName" placeholder="Full name" />
+        <input id="regEmail" placeholder="Email" />
+        <input id="regPassword" type="password" placeholder="Password" />
+        <label class="small">Interests (comma separated, e.g. Cardiology,Neurology)</label>
+        <input id="regInterests" placeholder="Interests" />
+        <button id="registerBtn" class="btn">Create account</button>
+      </div>
+    </section>
+
+    <!-- Dashboard -->
+    <section id="dashboard" class="view hidden">
+      <h2>Dashboard</h2>
+      <div class="row">
+        <div class="col">
+          <h3>Your Info</h3>
+          <p id="userInfo" class="small"></p>
+          <button id="subscribeBtn" class="btn">Subscribe / Renew (₹50)</button>
+          <div id="subStatus" class="small" style="margin-top:8px"></div>
+        </div>
+        <div class="col">
+          <h3>Quick actions</h3>
+          <div class="flex">
+            <button class="btn-secondary" data-view="papers">View papers</button>
+            <button class="btn-secondary" data-view="posts">Open forum</button>
+            <button class="btn-secondary" data-view="network">Find peers</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Papers -->
+    <section id="papers" class="view hidden">
+      <h2>Papers</h2>
+      <div style="display:flex; gap:12px; align-items:center;">
+        <select id="categoryFilter" style="max-width:220px;">
+          <option value="">All</option>
+          <option>Cardiology</option>
+          <option>Neurology</option>
+          <option>Oncology</option>
+          <option>Pediatrics</option>
+        </select>
+        <button id="newPaperToggle" class="btn-secondary">Upload / Add Paper</button>
+      </div>
+
+      <div id="paperForm" class="hidden" style="margin-top:12px; max-width:700px;">
+        <input id="paperTitle" placeholder="Title" />
+        <input id="paperAuthor" placeholder="Author" />
+        <select id="paperCategory">
+          <option>Cardiology</option>
+          <option>Neurology</option>
+          <option>Oncology</option>
+          <option>Pediatrics</option>
+        </select>
+        <textarea id="paperContent" placeholder="Summary / content" rows="4"></textarea>
+        <label><input type="checkbox" id="paperPremium" /> Mark as premium</label>
+        <button id="savePaperBtn" class="btn">Save Paper</button>
+      </div>
+
+      <div id="papersList" style="margin-top:16px;"></div>
+    </section>
+
+    <!-- Posts -->
+    <section id="posts" class="view hidden">
+      <h2>Posts / Discussions</h2>
+      <div style="max-width:700px;">
+        <input id="postTitle" placeholder="Post title" />
+        <textarea id="postContent" placeholder="Write your post..." rows="4"></textarea>
+        <select id="postCategory">
+          <option>General</option>
+          <option>Case discussion</option>
+          <option>Resources</option>
+        </select>
+        <button id="addPostBtn" class="btn">Add post</button>
+      </div>
+      <div id="postsList" style="margin-top:16px;"></div>
+    </section>
+
+    <!-- Network -->
+    <section id="network" class="view hidden">
+      <h2>Network</h2>
+      <p class="small">Find users with overlapping interests.</p>
+      <div id="networkList"></div>
+    </section>
+
+    <footer>Demo SPA — Data stored in localStorage. This simulates the original app's frontend + simple logic.</footer>
+  </main>
+
+  <script>
+    // Simple single-file SPA with localStorage-based "backend" simulation
+    // Data model shapes inspired from your repo:
+    // User: { id, name, email, password, role: 'free'|'premium', interests: [], subscriptionEnd: timestamp|null }
+    // Paper: { id, title, author, category, content, isPremium, uploadedBy, createdAt }
+    // Post: { id, title, content, authorId, category, replies: [{userId, content, date}], createdAt }
+
+    // Utility
+    const $ = (id) => document.getElementById(id);
+    const nowISO = () => new Date().toISOString();
+    const uid = () => 'id_' + Math.random().toString(36).slice(2,9);
+
+    // Storage keys
+    const KEY_USERS = 'mi_users_v1';
+    const KEY_PAPERS = 'mi_papers_v1';
+    const KEY_POSTS = 'mi_posts_v1';
+    const KEY_AUTH = 'mi_auth_v1';
+
+    // Seed initial data if absent
+    function seedData() {
+      if (!localStorage.getItem(KEY_USERS)) {
+        const users = [
+          { id: uid(), name: 'Alice Rao', email: 'alice@example.com', password: 'pass123', role: 'premium', interests: ['Cardiology','Oncology'], subscriptionEnd: new Date(Date.now()+10*24*3600*1000).toISOString() },
+          { id: uid(), name: 'Dr. Ben', email: 'ben@example.com', password: 'pass123', role: 'free', interests: ['Neurology'], subscriptionEnd: null },
+          { id: uid(), name: 'Clara', email: 'clara@example.com', password: 'pass123', role: 'free', interests: ['Cardiology','Pediatrics'], subscriptionEnd: null },
+        ];
+        localStorage.setItem(KEY_USERS, JSON.stringify(users));
+      }
+      if (!localStorage.getItem(KEY_PAPERS)) {
+        const users = JSON.parse(localStorage.getItem(KEY_USERS));
+        const papers = [
+          { id: uid(), title: 'Advances in Cardio A', author: 'Alice Rao', category: 'Cardiology', content: 'Summary of study A...', isPremium: false, uploadedBy: users[0].id, createdAt: nowISO() },
+          { id: uid(), title: 'Neuro study B', author: 'Dr. Ben', category: 'Neurology', content: 'Interesting neuro case...', isPremium: true, uploadedBy: users[1].id, createdAt: nowISO() },
+        ];
+        localStorage.setItem(KEY_PAPERS, JSON.stringify(papers));
+      }
+      if (!localStorage.getItem(KEY_POSTS)) {
+        const posts = [
+          { id: uid(), title: 'Case: young patient syncope', content: 'What are differential dx?', authorId: JSON.parse(localStorage.getItem(KEY_USERS))[0].id, category: 'Case discussion', replies: [], createdAt: nowISO() },
+        ];
+        localStorage.setItem(KEY_POSTS, JSON.stringify(posts));
+      }
+    }
+
+    seedData();
+
+    // Simple auth token: store logged-in user id in localStorage under KEY_AUTH
+    function getAuth() { return JSON.parse(localStorage.getItem(KEY_AUTH) || 'null'); }
+    function setAuth(userId) { localStorage.setItem(KEY_AUTH, JSON.stringify({ userId })); }
+    function clearAuth() { localStorage.removeItem(KEY_AUTH); }
+
+    function currentUser() {
+      const auth = getAuth();
+      if (!auth) return null;
+      const users = JSON.parse(localStorage.getItem(KEY_USERS) || '[]');
+      return users.find(u=>u.id === auth.userId) || null;
+    }
+
+    // UI routing
+    const views = Array.from(document.querySelectorAll('.view'));
+    function showView(name) {
+      views.forEach(v => v.id === name ? v.classList.remove('hidden') : v.classList.add('hidden'));
+      // update nav visibility
+      const user = currentUser();
+      if (user) {
+        $('nav').classList.remove('hidden');
+        $('auth-nav').classList.add('hidden');
+        $('welcome').textContent = `Signed in as ${user.name} · ${user.role}`;
+      } else {
+        $('nav').classList.add('hidden');
+        $('auth-nav').classList.remove('hidden');
+        $('welcome').textContent = '';
+      }
+      // render view-specific content
+      if (name === 'dashboard') renderDashboard();
+      if (name === 'papers') renderPapers();
+      if (name === 'posts') renderPosts();
+      if (name === 'network') renderNetwork();
+    }
+
+    // Attach nav buttons
+    document.querySelectorAll('nav button, #auth-nav button, .btn-secondary[data-view]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const view = btn.getAttribute('data-view');
+        if (view) showView(view);
+      });
+    });
+
+    // Top nav logout
+    $('logoutBtn').addEventListener('click', () => {
+      clearAuth();
+      showView('login');
+    });
+
+    // Links between login/register
+    $('toRegister').addEventListener('click', (e) => { e.preventDefault(); showView('register'); });
+
+    // Login flow
+    $('loginBtn').addEventListener('click', () => {
+      const email = $('loginEmail').value.trim();
+      const password = $('loginPassword').value;
+      const users = JSON.parse(localStorage.getItem(KEY_USERS) || '[]');
+      const u = users.find(x => x.email.toLowerCase() === email.toLowerCase());
+      if (!u || u.password !== password) { alert('Invalid credentials'); return; }
+      setAuth(u.id);
+      showView('dashboard');
+    });
+
+    // Register
+    $('registerBtn').addEventListener('click', () => {
+      const name = $('regName').value.trim();
+      const email = $('regEmail').value.trim();
+      const password = $('regPassword').value;
+      const interests = $('regInterests').value.split(',').map(s=>s.trim()).filter(Boolean);
+      if (!name || !email || !password) { alert('Please fill all fields'); return; }
+      const users = JSON.parse(localStorage.getItem(KEY_USERS) || '[]');
+      if (users.find(u=>u.email.toLowerCase() === email.toLowerCase())) { alert('Email already exists'); return; }
+      const newUser = { id: uid(), name, email, password, role: 'free', interests, subscriptionEnd: null };
+      users.push(newUser);
+      localStorage.setItem(KEY_USERS, JSON.stringify(users));
+      setAuth(newUser.id);
+      showView('dashboard');
+    });
+
+    // Dashboard rendering
+    function renderDashboard() {
+      const user = currentUser();
+      if (!user) return showView('login');
+      $('userInfo').innerHTML = `<strong>${user.name}</strong> <div class="small">Email: ${user.email}</div>
+        <div class="small">Interests: ${user.interests.join(', ') || '—'}</div>
+        <div class="small">Role: <span class="user-chip">${user.role}</span></div>`;
+      updateSubStatus();
+    }
+
+    function updateSubStatus() {
+      const user = currentUser();
+      if (!user) return;
+      const el = $('subStatus');
+      if (user.subscriptionEnd && new Date(user.subscriptionEnd) > new Date()) {
+        el.textContent = `Subscription active until ${new Date(user.subscriptionEnd).toLocaleString()}`;
+      } else {
+        el.textContent = 'No active subscription';
+        // if previously premium but expired, downgrade role
+        if (user.role === 'premium') {
+          // downgrade in storage
+          const users = JSON.parse(localStorage.getItem(KEY_USERS) || '[]');
+          const uidx = users.findIndex(x => x.id === user.id);
+          if (uidx !== -1) { users[uidx].role = 'free'; users[uidx].subscriptionEnd = null; localStorage.setItem(KEY_USERS, JSON.stringify(users)); }
+        }
+      }
+      // refresh top-welcome role display
+      const u = currentUser();
+      if (u) $('welcome').textContent = `Signed in as ${u.name} · ${u.role}`;
+    }
+
+    // Subscribe simulation (no real payment)
+    $('subscribeBtn').addEventListener('click', () => {
+      const user = currentUser();
+      if (!user) return showView('login');
+      if (!confirm('Simulate payment of ₹50 and activate 30-day subscription?')) return;
+      const users = JSON.parse(localStorage.getItem(KEY_USERS) || '[]');
+      const uidx = users.findIndex(x => x.id === user.id);
+      if (uidx === -1) return alert('User not found');
+      users[uidx].role = 'premium';
+      users[uidx].subscriptionEnd = new Date(Date.now() + 30*24*3600*1000).toISOString();
+      localStorage.setItem(KEY_USERS, JSON.stringify(users));
+      alert('Subscription activated (simulated).');
+      renderDashboard();
+    });
+
+    // Papers
+    $('newPaperToggle').addEventListener('click', () => $('paperForm').classList.toggle('hidden'));
+    $('savePaperBtn').addEventListener('click', () => {
+      const t = $('paperTitle').value.trim();
+      const a = $('paperAuthor').value.trim();
+      const c = $('paperCategory').value;
+      const cont = $('paperContent').value.trim();
+      const isPremium = $('paperPremium').checked;
+      const user = currentUser();
+      if (!user) { alert('Login first'); showView('login'); return; }
+      if (!t || !a) { alert('Please provide title & author'); return; }
+      const papers = JSON.parse(localStorage.getItem(KEY_PAPERS) || '[]');
+      papers.unshift({ id: uid(), title: t, author: a, category: c, content: cont, isPremium, uploadedBy: user.id, createdAt: nowISO() });
+      localStorage.setItem(KEY_PAPERS, JSON.stringify(papers));
+      $('paperTitle').value=''; $('paperAuthor').value=''; $('paperContent').value=''; $('paperPremium').checked=false;
+      $('paperForm').classList.add('hidden');
+      renderPapers();
+    });
+
+    $('categoryFilter').addEventListener('change', renderPapers);
+
+    function renderPapers() {
+      const user = currentUser();
+      if (!user) return showView('login');
+      const cat = $('categoryFilter').value;
+      let papers = JSON.parse(localStorage.getItem(KEY_PAPERS) || '[]');
+      if (cat) papers = papers.filter(p => p.category === cat);
+      if (user.role !== 'premium') papers = papers.filter(p => !p.isPremium);
+      const el = $('papersList');
+      el.innerHTML = '';
+      if (!papers.length) el.innerHTML = '<p class="small">No papers found.</p>';
+      papers.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'paper';
+        div.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <h3 style="margin:0">${escapeHtml(p.title)} ${p.isPremium ? '<span class="premium">Premium</span>' : ''}</h3>
+              <div class="meta">${escapeHtml(p.author)} · ${p.category} · <span class="small">${new Date(p.createdAt).toLocaleString()}</span></div>
+            </div>
+            <div style="text-align:right;">
+              <button class="btn-secondary" data-id="${p.id}" onclick="viewPaper('${p.id}')">View</button>
+            </div>
+          </div>
+          <p class="small" style="margin-top:8px">${escapeHtml(p.content.slice(0,200))}${p.content.length>200?'...':''}</p>`;
+        el.appendChild(div);
+      });
+    }
+
+    // View paper (modal-like alert)
+    window.viewPaper = (id) => {
+      const papers = JSON.parse(localStorage.getItem(KEY_PAPERS) || '[]');
+      const p = papers.find(x=>x.id===id);
+      if (!p) return alert('Not found');
+      const user = currentUser();
+      if (p.isPremium && (!user || user.role !== 'premium' || !user.subscriptionEnd || new Date(user.subscriptionEnd) < new Date())) {
+        if (!user) { showView('login'); return; }
+        if (!confirm('This is premium content. Subscribe now?')) return;
+        showView('dashboard');
+        return;
+      }
+      alert(`${p.title}\n\nBy ${p.author}\nCategory: ${p.category}\n\n${p.content}`);
+    };
+
+    // Posts
+    $('addPostBtn').addEventListener('click', () => {
+      const title = $('postTitle').value.trim();
+      const content = $('postContent').value.trim();
+      const category = $('postCategory').value;
+      const user = currentUser();
+      if (!user) return showView('login');
+      if (!title || !content) return alert('Provide title and content');
+      const posts = JSON.parse(localStorage.getItem(KEY_POSTS) || '[]');
+      posts.unshift({ id: uid(), title, content, authorId: user.id, category, replies: [], createdAt: nowISO() });
+      localStorage.setItem(KEY_POSTS, JSON.stringify(posts));
+      $('postTitle').value=''; $('postContent').value='';
+      renderPosts();
+    });
+
+    function renderPosts() {
+      const user = currentUser();
+      if (!user) return showView('login');
+      const posts = JSON.parse(localStorage.getItem(KEY_POSTS) || '[]');
+      const users = JSON.parse(localStorage.getItem(KEY_USERS) || '[]');
+      const el = $('postsList');
+      el.innerHTML = '';
+      if (!posts.length) el.innerHTML = '<p class="small">No posts yet.</p>';
+      posts.forEach(p => {
+        const author = users.find(u => u.id === p.authorId);
+        const div = document.createElement('div');
+        div.className = 'paper';
+        div.innerHTML = `<h3 style="margin:0">${escapeHtml(p.title)}</h3>
+              <div class="meta">By ${escapeHtml(author ? author.name : 'Unknown')} · ${p.category} · <span class="small">${new Date(p.createdAt).toLocaleString()}</span></div>
+              <p class="small" style="margin-top:8px">${escapeHtml(p.content)}</p>
+              <div id="replies-${p.id}" style="margin-top:8px"></div>
+              <div style="margin-top:8px;">
+                <input id="replyInput-${p.id}" placeholder="Write reply..." />
+                <button class="btn-secondary" onclick="addReply('${p.id}')">Reply</button>
+              </div>`;
+        el.appendChild(div);
+        renderReplies(p);
+      });
+    }
+
+    window.addReply = (postId) => {
+      const val = document.getElementById('replyInput-' + postId).value.trim();
+      if (!val) return;
+      const user = currentUser();
+      if (!user) return showView('login');
+      const posts = JSON.parse(localStorage.getItem(KEY_POSTS) || '[]');
+      const idx = posts.findIndex(x => x.id === postId);
+      if (idx === -1) return;
+      posts[idx].replies.push({ userId: user.id, content: val, date: nowISO() });
+      localStorage.setItem(KEY_POSTS, JSON.stringify(posts));
+      document.getElementById('replyInput-' + postId).value = '';
+      renderReplies(posts[idx]);
+    };
+
+    function renderReplies(post) {
+      const users = JSON.parse(localStorage.getItem(KEY_USERS) || '[]');
+      const container = document.getElementById('replies-' + post.id);
+      if (!container) return;
+      if (!post.replies.length) { container.innerHTML = '<div class="small">No replies</div>'; return; }
+      container.innerHTML = post.replies.map(r => {
+        const u = users.find(x=>x.id===r.userId);
+        return `<div style="border-top:1px solid #f1f5f9;padding-top:8px;margin-top:8px;">
+          <div class="small"><strong>${escapeHtml(u ? u.name : 'Unknown')}</strong> · <span class="meta">${new Date(r.date).toLocaleString()}</span></div>
+          <div class="small">${escapeHtml(r.content)}</div>
+        </div>`;
+      }).join('');
+    }
+
+    // Network - find users with shared interests
+    function renderNetwork() {
+      const user = currentUser();
+      if (!user) return showView('login');
+      const users = JSON.parse(localStorage.getItem(KEY_USERS) || '[]');
+      const others = users.filter(u => u.id !== user.id && u.interests.some(i => user.interests.includes(i)));
+      const el = $('networkList');
+      el.innerHTML = '';
+      if (!others.length) { el.innerHTML = '<p class="small">No similar users found. Add interests to match others.</p>'; return; }
+      others.forEach(u => {
+        const shared = u.interests.filter(i => user.interests.includes(i));
+        const div = document.createElement('div');
+        div.className = 'paper';
+        div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div><strong>${escapeHtml(u.name)}</strong> <span class="small" style="margin-left:8px">${escapeHtml(u.role)}</span></div>
+            <div class="small">Interests: ${escapeHtml(u.interests.join(', '))}</div>
+            <div class="small">Shared: ${escapeHtml(shared.join(', '))}</div>
+          </div>
+          <div><button class="btn-secondary" onclick="messageUser('${u.id}')">Message</button></div>
+        </div>`;
+        el.appendChild(div);
+      });
+    }
+
+    window.messageUser = (id) => {
+      const users = JSON.parse(localStorage.getItem(KEY_USERS) || '[]');
+      const u = users.find(x=>x.id===id);
+      if (!u) return alert('User not found');
+      alert('Simulated message: ' + u.name + '\\n(Feature not implemented in demo)');
+    };
+
+    // Small helper: escape HTML
+    function escapeHtml(s) {
+      if (!s) return '';
+      return s.replace(/[&<>"'\\/]/g, function (c) {
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;'}[c];
+      });
+    }
+
+    // wire up side nav and initial route
+    document.querySelectorAll('#nav button').forEach(b => b.addEventListener('click', (e) => {
+      const v = e.target.getAttribute('data-view');
+      if (v) showView(v);
+    }));
+    document.querySelectorAll('#auth-nav button').forEach(b => b.addEventListener('click', (e) => {
+      const v = e.target.getAttribute('data-view');
+      if (v) showView(v);
+    }));
+
+    // On load: if logged in, show dashboard else login
+    (function init() {
+      // Basic token expiry check to downgrade expired subs
+      const users = JSON.parse(localStorage.getItem(KEY_USERS) || '[]');
+      let changed = false;
+      users.forEach(u => {
+        if (u.subscriptionEnd && new Date(u.subscriptionEnd) < new Date() && u.role === 'premium') {
+          u.role = 'free'; u.subscriptionEnd = null; changed = true;
+        }
+      });
+      if (changed) localStorage.setItem(KEY_USERS, JSON.stringify(users));
+      const auth = getAuth();
+      if (auth && currentUser()) {
+        showView('dashboard');
+      } else {
+        showView('login');
+      }
+    })();
+
+  </script>
+</body>
+</html>
